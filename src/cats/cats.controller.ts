@@ -6,26 +6,45 @@ import {
   Get,
   Header,
   HttpCode,
+  HttpException,
+  HttpStatus,
   Param,
   Post,
   Put,
   Query,
 } from '@nestjs/common';
-import { CreateCatDto } from './create-cat.dto';
-import { UpdateCatDto } from './update-cat.dto';
+import { CreateCatDto } from './dto/create-cat.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
+import { CatsService } from './cats.service';
 
 @Controller('cats')
 export class CatsController {
+  constructor(private catsService: CatsService) {}
   @Post()
   async create(@Body() createCatDto: CreateCatDto) {
-    return 'This action adds a new cat';
+    return this.catsService.create(createCatDto);
   }
 
   // GET /cats?age=2&breed=siamese
   // Would result in age being 2 and breed being siamese
   @Get()
   async findAll(@Query('age') age: number, @Query('breed') breed: string) {
-    return `This action returns all cats filtered by age: ${age} and breed: ${breed}`;
+    try {
+      return this.catsService.findAll();
+    } catch (error) {
+      throw (
+        new HttpException(
+          {
+            status: HttpStatus.FORBIDDEN,
+            error: 'This is a a custom error',
+          },
+          HttpStatus.FORBIDDEN,
+        ),
+        {
+          cause: error,
+        }
+      );
+    }
   }
 
   @Put(':id')
