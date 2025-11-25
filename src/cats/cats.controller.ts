@@ -12,6 +12,7 @@ import {
   Post,
   Put,
   Query,
+  UsePipes,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
@@ -46,6 +47,13 @@ export class CatsController {
       );
     }
   }
+
+  /*
+  @Get()
+  async findAll() {
+    throw new ForbiddenException();
+  }
+  */
 
   @Put(':id')
   update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
