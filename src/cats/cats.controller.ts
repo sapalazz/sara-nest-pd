@@ -12,16 +12,27 @@ import {
   Post,
   Put,
   Query,
-  UsePipes,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateCatDto } from './dto/create-cat.dto';
 import { UpdateCatDto } from './dto/update-cat.dto';
 import { CatsService } from './cats.service';
+import { RolesGuard } from '../roles.guard';
+import { Roles } from 'src/roles.decorator';
+import { LoggingInterceptor } from 'src/logging.interceptor';
 
 @Controller('cats')
+@UseGuards(RolesGuard)
+// using this interceptor we will see this standard output for each request:
+// "Before...
+// After... 1ms"
+@UseInterceptors(LoggingInterceptor)
 export class CatsController {
   constructor(private catsService: CatsService) {}
   @Post()
+  // only users with the admin role can access this route
+  @Roles(['admin'])
   async create(@Body() createCatDto: CreateCatDto) {
     return this.catsService.create(createCatDto);
   }

@@ -9,12 +9,26 @@ import { AppService } from './app.service';
 import { CatsController } from './cats/cats.controller';
 import { CatsService } from './cats/cats.service';
 import { CatsModule } from './cats/cats.module';
-import { LoggerMiddleware } from './cats/logger.middleware';
+import { LoggerMiddleware } from './logger.middleware';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { RolesGuard } from './roles.guard';
+import { LoggingInterceptor } from './logging.interceptor';
 
 @Module({
   imports: [CatsModule],
   controllers: [AppController, CatsController],
-  providers: [AppService, CatsService],
+  providers: [
+    AppService,
+    CatsService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
